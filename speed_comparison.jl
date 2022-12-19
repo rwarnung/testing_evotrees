@@ -1,22 +1,23 @@
+## this code is based on https://github.com/Evovest/EvoTrees.jl/blob/main/experiments/benchmarks-regressor.jl
+## a documentaton of the model can be found at https://evovest.github.io/EvoTrees.jl/dev/
+
 using Revise
 using Statistics
 using StatsBase: sample
 using XGBoost
-# using LightGBM
 using EvoTrees
 using BenchmarkTools
-# using CUDA
 
 nrounds = 200
-nobs = Int(1e6)
+nobs = Int(1_000_000)
 num_feat = Int(100)
 T = Float32
 nthread = Base.Threads.nthreads()
+@info "testing with: $nthread thread(s)."
 @info "testing with: $nobs observations | $num_feat features."
 x_train = rand(T, nobs, num_feat)
 y_train = rand(T, size(x_train, 1))
 
-@info nthread
 loss = "linear"
 if loss == "linear"
     loss_xgb = "reg:squarederror"
@@ -36,7 +37,7 @@ params_xgb = Dict(
     :max_depth => 5,
     :eta => 0.05,
     :objective => loss_xgb,
-    :print_every_n => 5,
+    :print_every_n => 50,
     :subsample => 0.5,
     :colsample_bytree => 0.5,
     :tree_method => "hist",
@@ -74,12 +75,5 @@ params_evo.device = "cpu"
 @time pred_evo = EvoTrees.predict(m_evo, x_train);
 @btime EvoTrees.predict($m_evo, $x_train);
 
-#@info "evotrees train GPU:"
-#params_evo.device = "gpu"
-#@time m_evo_gpu = fit_evotree(params_evo; x_train, y_train, x_eval=x_train, y_eval=y_train, metric=metric_evo, print_every_n=100);
-# @time m_evo_gpu = fit_evotree(params_evo; x_train, y_train, x_eval=x_train, y_eval=y_train, metric=metric_evo, print_every_n=100);
-# @time m_evo_gpu = fit_evotree(params_evo; x_train, y_train);
-#@btime fit_evotree($params_evo; x_train=$x_train, y_train=$y_train, x_eval=$x_train, y_eval=$y_train, metric=metric_evo);
-#@info "evotrees predict GPU:"
-#@time pred_evo = EvoTrees.predict(m_evo_gpu, x_train);
-#@btime EvoTrees.predict($m_evo_gpu, $x_train);
+using Pkg
+Pkg.status()
