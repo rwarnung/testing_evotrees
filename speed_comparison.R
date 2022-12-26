@@ -1,9 +1,9 @@
 library(JuliaCall) ## notes on julia call https://hwborchers.github.io/
 library(xgboost)
 
-n_obs = 1000000
+n_obs = 1500000
 n_features = 100
-nrounds = 200
+nrounds = 400
 
 set.seed(20221224)
 
@@ -59,6 +59,8 @@ julia_assign("y_train", y_train)
 
 ## Float64 
 julia_eval("typeof(x_train)")
+cat("nr of threads used by julia")
+julia_eval("Base.Threads.nthreads()")
 ## can be converted to Float32
 # julia_eval( "x_train = convert.(Float32,x_train);")
 
@@ -94,3 +96,11 @@ tictoc::toc()
 length(pred_evo)
 
 cor(pred_xgb, pred_evo)
+
+## using the R package EvoTrees by the author of the julia package EvoTrees
+#devtools::install_github("Evovest/EvoTrees")
+#library(EvoTrees)
+## does not work as " C:\Users\rwarn\AppData\Local\Programs\JULIA-~1.2\bin\libjulia.dll - %1 ist keine zulässige Win32-Anwendung."
+
+## using https://github.com/stefan-m-lenz/JuliaConnectoR
+library(JuliaConnectoR)

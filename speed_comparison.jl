@@ -8,12 +8,19 @@ using XGBoost
 using EvoTrees
 using BenchmarkTools
 
+## setting the number of threads https://docs.julialang.org/en/v1/manual/environment-variables/
+##ENV["JULIA_NUM_THREADS"] = 4 this is too late. Setting it in the start up file ~/.julia/config/startup.jl
+## where ~/.julia/config/startup.jl would be a start up file is also too late
+## set JULIA_NUM_THREADS=4 e.g. as a windows environment variable
+
 nrounds = 200
 nobs = Int(1_000_000)
 num_feat = Int(100)
 T = Float32
 nthread = Base.Threads.nthreads()
+avail_nthread = Base.Sys.CPU_THREADS
 @info "testing with: $nthread thread(s)."
+@info "available threads: $avail_nthread."
 @info "testing with: $nobs observations | $num_feat features."
 x_train = rand(T, nobs, num_feat)
 y_train = rand(T, size(x_train, 1))
@@ -37,7 +44,7 @@ params_xgb = Dict(
     :max_depth => 5,
     :eta => 0.05,
     :objective => loss_xgb,
-    :print_every_n => 50,
+    :print_every_n => 0,
     :subsample => 0.5,
     :colsample_bytree => 0.5,
     :tree_method => "hist",
