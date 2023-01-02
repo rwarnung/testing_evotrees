@@ -8,6 +8,6 @@ Next steps:
 - A direct call of the R package [EvoTrees](https://github.com/Evovest/EvoTrees) did not work as the package could not be installed.
 - Trying to call Julia with the package [JuliaConnectoR](https://github.com/stefan-m-lenz/JuliaConnectoR) to see whether it has less overhead than JuliaCall. Current state (January 2, 2023): training the model worked, but prediction not. The speed improvement does not motivate further analysis at the moment.
 
-Summary: JuliaCall could be used to call Julia from R.
+Summary: EvoTrees offers a speed-up of up to 50% (in pure Julia, less if called from R). JuliaCall could be used to call Julia from R.
 
 
