@@ -1,9 +1,9 @@
 library(JuliaCall) ## notes on julia call https://hwborchers.github.io/
 library(xgboost)
 
-n_obs = 1500000
+n_obs = 1500000 # 1500000
 n_features = 100
-nrounds = 400
+nrounds = 400L #400
 
 set.seed(20221224)
 
@@ -68,6 +68,7 @@ julia_eval("Base.Threads.nthreads()")
 
 ## the max.depth parameter of EvoTrees corresponds to max.depth of xgboost-1
 julia_command(paste0("params_evo = EvoTreeRegressor(
+                          T = Float64,
                           loss = :linear
                           ,nrounds=",nrounds,",alpha=0.5,lambda=0.0,gamma=0.0,eta=", params_xgb$eta,
                           ",max_depth=", params_xgb$max_depth+1, 
@@ -75,16 +76,16 @@ julia_command(paste0("params_evo = EvoTreeRegressor(
                           ",rowsample=", params_xgb$subsample,
                           ",colsample=", params_xgb$colsample_bytree,
                           ",nbins=", params_xgb$max_bin,
-                          ",rng = 123)")
+                          ",rng = 123);")
 )
 
 julia_assign("params_evo.device", "cpu")
 julia_command("params_evo")
 
 tictoc::tic()
-julia_eval("m_evo = fit_evotree(params_evo; x_train, y_train, x_eval=x_train, y_eval=y_train, metric = :mae, print_every_n=50);")
-print("\n")
+julia_command("m_evo = fit_evotree(params_evo; x_train, y_train, x_eval=x_train, y_eval=y_train, metric = :mae, print_every_n = 50);")
 tictoc::toc()
+print("evotree trained")
 
 print("evotrees predict CPU:")
 
@@ -96,11 +97,3 @@ tictoc::toc()
 length(pred_evo)
 
 cor(pred_xgb, pred_evo)
-
-## using the R package EvoTrees by the author of the julia package EvoTrees
-#devtools::install_github("Evovest/EvoTrees")
-#library(EvoTrees)
-## does not work as " C:\Users\rwarn\AppData\Local\Programs\JULIA-~1.2\bin\libjulia.dll - %1 ist keine zulässige Win32-Anwendung."
-
-## using https://github.com/stefan-m-lenz/JuliaConnectoR
-library(JuliaConnectoR)
