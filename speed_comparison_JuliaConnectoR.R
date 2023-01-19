@@ -52,10 +52,10 @@ Sys.setenv(JULIA_BINDIR = "C:/Users/rwarn/AppData/Local/Programs/Julia-1.8.2/bin
 
 ## check whether julia can be found
 tryCatch(system2(command="julia", args="--version"))
-EvoTrees = juliaImport("EvoTrees")
-params_evo = EvoTrees$EvoTreeRegressor(nrounds = nrounds, alpha=0.5,lambda=0.0,gamma=0.0
+EvoTrees = juliaImport("EvoTrees", all = FALSE)
+params_evo = EvoTrees$EvoTreeRegressor(nrounds = nrounds, alpha=0.5, lambda=0.0, gamma=0.0
                                        , eta=params_xgb$eta
-                                       , max_depth = params_xgb$max_depth+1
+                                       , max_depth = params_xgb$max_depth + 1
                                        , min_weight = params_xgb$min_child_weight
                                        , rowsample = params_xgb$subsample
                                        , colsample = params_xgb$colsample_bytree
@@ -63,7 +63,7 @@ params_evo = EvoTrees$EvoTreeRegressor(nrounds = nrounds, alpha=0.5,lambda=0.0,g
                                        , device = "cpu"
                                        , loss = as.symbol("linear")
                                        , rng = 123L
-                                       , T = juliaExpr("Float64")
+                                       , T = juliaExpr("Float32")
                                        )
 
 print("fields can be returned as follows")
@@ -78,5 +78,8 @@ tictoc::tic()
 evoTrees_model = EvoTrees$fit_evotree(params_evo, x_train = x_train, y_train = y_train, print_every_n=50)
 tictoc::toc()
 
-print("evotrees predict CPU: TOOD Not sure how to do this. But speed improvement does not motivate this at the moment.")
+print("evotrees predict CPU. This only works if you have the juliaConnectoR evotrees branch installed (https://github.com/Evovest/EvoTrees.jl/pull/200), use: ] add EvoTrees#juliaConnectoR")
 
+tictoc::tic()
+pred_evo = EvoTrees$predict_evotree(evoTrees_model, x_train)
+tictoc::toc()
