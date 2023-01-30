@@ -52,7 +52,7 @@ params_xgb = Dict(
 )
 
 dtrain = DMatrix(x_train, y_train .- 1)
-watchlist = Dict("train" => DMatrix(x_train, y_train .- 1))
+watchlist = (;) ## for no verbosity or watchlist = Dict("train" => DMatrix(x_train, y_train .- 1)) if you want to see progree on train
 @time m_xgb = xgboost(dtrain; watchlist, nthread=nthread, verbosity=0, eval_metric = metric_xgb, params_xgb...);
 @info "xgboost predict:"
 @time pred_xgb = XGBoost.predict(m_xgb, x_train);
